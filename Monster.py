@@ -23,6 +23,6 @@ print("M.O.N.S.T.E.R is ready!")
 
 print("Greetings, \nWelcome to the M.O.N.S.T.E.R. \n\nTo start a new entry type \"new entry\" \nType \"help\" to show a list of commands")
 
-listen()
+
 
 
