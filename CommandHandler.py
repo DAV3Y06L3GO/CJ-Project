@@ -1,4 +1,4 @@
-primative = {"users", "entries"}
+primative = {"users", "entries", "help"}
 twoStage = {"void", "new"}
 
 def parse(rawInput):
