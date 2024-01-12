@@ -58,6 +58,9 @@ def new(arg):
                         parse(input())
                         return
                 else: print("Sorry the given user name is invalid please pick a different name")
+        case "entry":
+            print("wowza")
+            #I NEED CJ AHHHHHHHHHHHHHHHHHHHHHHH
             
 
 
