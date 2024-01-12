@@ -69,3 +69,6 @@ def users():
         
         screen_clear()
         print("%s has been selected" % requested_user)
+
+def back():
+    screen_clear()

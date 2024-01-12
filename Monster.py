@@ -2,9 +2,6 @@ import CommandHandler
 
 commandList = {"new", "entries", "users", "void"}
 
-def homescreen():
-    print("Greetings, \nWelcome to the M.O.N.S.T.E.R. \n\nTo start a new entry type \"new entry\" \nType \"help\" to show a list of commands")
-
 #Stores username
 def newUser():
     while True:
@@ -20,8 +17,8 @@ def newUser():
 print("Initializing Mycological Observational Navigation System and Tracker for Enviromental Research...")
 
 print("M.O.N.S.T.E.R is ready!")
-homescreen()
 
-CommandHandler.parse(input())
+while True:
+    print("Greetings, \nWelcome to the M.O.N.S.T.E.R. \n\nTo start a new entry type \"new entry\" \nType \"help\" to show a list of commands")
 
-print("MONSTER done")
+    CommandHandler.parse(input())
