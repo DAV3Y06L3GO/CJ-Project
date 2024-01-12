@@ -1,6 +1,6 @@
 {
-  "users": {
-    "Ben Dover": true,
-    "Joe Biden": false
-  }
+  "Ben Dover": false,
+  "Joe Biden": true,
+  "Perry the Platypus": false,
+  "Bob the Tomato": false
 }

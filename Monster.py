@@ -8,7 +8,7 @@ def newUser():
         user = input("Please enter username: ") 
 
 
-        if input("\n%s is correct? (y/n)" % (user)) in {"yes", "y"}:
+        if input(f"\n{user} is correct? (y/n)") in {"yes", "y"}:
             CommandHandler.screen_clear()
             return user
 
