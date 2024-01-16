@@ -1,5 +1,6 @@
 import json
 import os
+import datetime
 
 
 
@@ -58,9 +59,35 @@ def new(arg):
                         parse(input())
                         return
                 else: print("Sorry the given user name is invalid please pick a different name")
+        
+        case "session":
+            entry_dirs = os.listdir("./data/entries/")
+            newest_dir = entry_dirs[len(entry_dirs) - 1]
+            session_number = int(newest_dir.rstrip(".json")) + 1
+
+            with open(f"./data/entries/{session_number}.json", "x") as file:
+                return
+
+                
+                
+        
         case "entry":
-            print("wowza")
-            #I NEED CJ AHHHHHHHHHHHHHHHHHHHHHHH
+            
+            with open("./data/entries.json", "r") as file:
+                entry_data = json.load(file)
+            
+            now = datetime.datetime.now()
+
+            print("Current date: %s?\n" % (now.strftime("%x, %H:%M %p")))
+            date_conf = input("Type \"confirm\" or enter a custom date")
+
+            #if date_conf == "confirm":
+
+
+                
+
+                
+            
             
 
 
