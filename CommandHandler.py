@@ -66,10 +66,7 @@ def new(arg):
             session_number = int(newest_dir.rstrip(".json")) + 1
 
             with open(f"./data/entries/{session_number}.json", "x") as file:
-                return
-
-                
-                
+                return       
         
         case "entry":
             
