@@ -6,6 +6,8 @@ import datetime
 
 blacklist = ["parse"]
 
+session_number = 1
+
 def clear(): 
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -37,6 +39,8 @@ def parse(raw_input, list=[]):
 
 def new(arg):
     clear()
+    global session_number
+
     match arg:
         case "user":
             #new user screen
@@ -70,16 +74,59 @@ def new(arg):
         
         case "entry":
             
-            with open("./data/entries.json", "r") as file:
-                entry_data = json.load(file)
+            try: 
+                with open(f"./data/entries/{session_number}.json", "r") as file:
+                    session_data = json.load(file)
+            except:
+                print("Session not found or not selected please select or create a new session.\n")
+                return
             
+            name = input("What would you like to call this entry?\n")
+            new_entry = {
+                name: {
+                    "gps": None,
+                    "date": None,
+                    "genus": None,
+                    "species": None,
+                    "substrate": None,
+                    "terrain": None,
+                    "gill": None,
+                    "other": None
+                }
+            }
+
+            ####################GPS GOES HERE########################
+            
+            # time & date register
             now = datetime.datetime.now()
+            new_entry[name]["date"] = now.strftime("%x, %H:%M")
 
-            print("Current date: %s?\n" % (now.strftime("%x, %H:%M %p")))
-            date_conf = input("Type \"confirm\" or enter a custom date")
+            # Genus registry
+            register(new_entry, name, "genus")
+            
+            
+            # Species Registry
+            register(new_entry, name, "species")
 
-            #if date_conf == "confirm":
 
+
+
+            comb_entries = {**session_data, **new_entry}
+
+            with open(f"./data/entries/{session_number}.json", "w") as file:
+                json.dump(comb_entries, file, indent=2)
+
+            
+def register(dict, entry, key, type="i"):
+    while True:
+            match type:
+                case "i":
+                    user_input = input(f"What is the {key}?\n")
+                    if user_input.strip and user_input.isprintable():
+                        dict[entry][key] = user_input
+                        break
+                    else:
+                        print("String empty, please try again")
 
                 
 
