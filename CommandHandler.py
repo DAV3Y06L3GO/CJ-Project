@@ -6,6 +6,12 @@ import datetime
 
 blacklist = ["parse"]
 
+
+gill_types = dict(enumerate(["Adnate", "Adnexed", "Decurrent", "Emarginate", "Free", "Seceding", "Sinuate", "Subdecurrent"]))
+
+
+
+
 session_number = 1
 
 def clear(): 
@@ -108,7 +114,12 @@ def new(arg):
             # Species Registry
             register(new_entry, name, "species")
 
+            # Substrate Registry
 
+            # Habitat Registry
+
+            # Gill Registry
+            register(new_entry, name, "gill", "d")
 
 
             comb_entries = {**session_data, **new_entry}
@@ -124,9 +135,28 @@ def register(dict, entry, key, type="i"):
                     user_input = input(f"What is the {key}?\n")
                     if user_input.strip and user_input.isprintable():
                         dict[entry][key] = user_input
-                        break
+                        return
                     else:
                         print("String empty, please try again")
+                
+                case "d":
+                    print(f"Please select a {key} type:")
+                    for x in gill_types:
+                        print(f"\t{x}:{gill_types[x]}")
+                    
+                    user_input = input()
+
+                    for x in gill_types:
+                        if user_input == str(x) or user_input == gill_types[x]:
+                            dict[entry][key] = gill_types[x]
+                            return
+                    print(f"String was not a valid {key} type, please try again")
+                        
+                    
+                    
+                    
+                    
+
 
                 
 
