@@ -31,12 +31,32 @@
   },
   "FIn": {
     "gps": null,
-    "date": "01/19/24, 17:29",
-    "genus": "Rat's Nest",
-    "species": "4 Year Old",
-    "substrate": null,
-    "terrain": null,
-    "gill": null,
+    "date": "01/21/24, 19:59",
+    "genus": "WIld",
+    "species": "Unknown",
+    "substrate": "sand",
+    "terrain": "sky",
+    "gill": "Free",
+    "other": "WABBLE BOBBLE BOOSH"
+  },
+  "FIN": {
+    "gps": null,
+    "date": "01/21/24, 19:12",
+    "genus": "Angry",
+    "species": "unknown",
+    "substrate": "sand",
+    "terrain": "green",
+    "gill": "Free",
     "other": null
+  },
+  "Bees": {
+    "gps": null,
+    "date": "01/21/24, 20:02",
+    "genus": "GAY",
+    "species": "BEE",
+    "substrate": "honey",
+    "terrain": "hive",
+    "gill": "Sinuate",
+    "other": "I LIK<E BEES"
   }
 }

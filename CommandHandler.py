@@ -115,11 +115,16 @@ def new(arg):
             register(new_entry, name, "species")
 
             # Substrate Registry
+            register(new_entry, name, "substrate")
 
             # Habitat Registry
+            register(new_entry, name, "terrain")
 
             # Gill Registry
             register(new_entry, name, "gill", "d")
+
+            # other
+            register(new_entry, name, "other", message="Any other notes?")
 
 
             comb_entries = {**session_data, **new_entry}
@@ -128,11 +133,16 @@ def new(arg):
                 json.dump(comb_entries, file, indent=2)
 
             
-def register(dict, entry, key, type="i"):
+def register(dict, entry, key, type="i", message=None):
     while True:
             match type:
                 case "i":
-                    user_input = input(f"What is the {key}?\n")
+                    if message:
+                        print(message)
+                    else:
+                        print(f"What is the {key}?")
+                    user_input = input()
+
                     if user_input.strip and user_input.isprintable():
                         dict[entry][key] = user_input
                         return
