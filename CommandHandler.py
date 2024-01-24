@@ -4,7 +4,7 @@ import datetime
 
 
 
-blacklist = ["parse"]
+blacklist = ["parse", "register"]
 
 
 gill_types = dict(enumerate(["Adnate", "Adnexed", "Decurrent", "Emarginate", "Free", "Seceding", "Sinuate", "Subdecurrent"]))
@@ -17,9 +17,15 @@ session_number = 1
 def clear(): 
     os.system('cls' if os.name == 'nt' else 'clear')
 
+
 def parse(raw_input, list=[]):
-    if raw_input in list:
-        return raw_input
+    try:
+        if raw_input in str(list):
+            return raw_input
+    except TypeError as error:
+        print(error)
+        return parse(input(), list=list)
+
     
     try: 
         command_name, *arguments = raw_input.split()
@@ -34,12 +40,15 @@ def parse(raw_input, list=[]):
         else:
             try: 
                 stack() 
-            except:
-                print("Given command is missing a parameter")
-                return parse(input(), list=list)
+            except TypeError as error:
+              print(error)
+              print("Given command is missing a parameter")
+              return parse(input(), list=list)
     else:
         print("Command not found, try again or type \"help\".")
         return parse(input(), list=list)
+
+
 
 
 
@@ -71,17 +80,17 @@ def new(arg):
                 else: print("Sorry the given user name is invalid please pick a different name")
         
         case "session":
-            entry_dirs = os.listdir("./data/entries/")
-            newest_dir = entry_dirs[len(entry_dirs) - 1]
-            session_number = int(newest_dir.rstrip(".json")) + 1
+            session_list = os.listdir("./data/sessions/")
+            newest_session = session_list[len(session_list) - 1]
+            session_number = int(newest_session.rstrip(".json")) + 1
 
-            with open(f"./data/entries/{session_number}.json", "x") as file:
+            with open(f"./data/sessions/{session_number}.json", "x") as file:
                 return       
         
         case "entry":
             
             try: 
-                with open(f"./data/entries/{session_number}.json", "r") as file:
+                with open(f"./data/sessions/{session_number}.json", "r") as file:
                     session_data = json.load(file)
             except:
                 print("Session not found or not selected please select or create a new session.\n")
@@ -121,7 +130,7 @@ def new(arg):
             register(new_entry, name, "terrain")
 
             # Gill Registry
-            register(new_entry, name, "gill", "d")
+            register(new_entry, name, "gill", "d", gill_types)
 
             # other
             register(new_entry, name, "other", message="Any other notes?")
@@ -129,7 +138,7 @@ def new(arg):
 
             comb_entries = {**session_data, **new_entry}
 
-            with open(f"./data/entries/{session_number}.json", "w") as file:
+            with open(f"./data/sessions/{session_number}.json", "w") as file:
                 json.dump(comb_entries, file, indent=2)
 
             
@@ -151,28 +160,32 @@ def register(dict, entry, key, type="i", message=None):
                 
                 case "d":
                     print(f"Please select a {key} type:")
-                    for x in gill_types:
-                        print(f"\t{x}:{gill_types[x]}")
+                    for x in message:
+                        print(f"\t{x}:{message[x]}")
                     
                     user_input = input()
 
-                    for x in gill_types:
-                        if user_input == str(x) or user_input == gill_types[x]:
-                            dict[entry][key] = gill_types[x]
+                    for x in message:
+                        if user_input == str(x) or user_input == message[x]:
+                            dict[entry][key] = message[x]
                             return
                     print(f"String was not a valid {key} type, please try again")
                         
                     
                     
-                    
-                    
 
+def sessions():
+    clear()
 
-                
+    session_list = os.listdir("./data/sessions/")
+    
+    for i in range(len(session_list)):
+        session_list[i] = "Session #" + session_list[i].rstrip(".json")
 
-                
-            
-            
+        print(session_list[i])
+    
+    parse(input(), session_list + list(range(1, len(session_list))))
+    
 
 
 
