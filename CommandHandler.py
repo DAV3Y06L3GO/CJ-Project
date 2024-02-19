@@ -1,4 +1,5 @@
 import json
+import DataHandler
 import os
 import datetime
 
@@ -9,10 +10,16 @@ blacklist = ["parse", "register"]
 
 gill_types = dict(enumerate(["Adnate", "Adnexed", "Decurrent", "Emarginate", "Free", "Seceding", "Sinuate", "Subdecurrent"]))
 
+current_session = None
 
+def getLatestSessionNumb():
+    session_list = os.listdir("./data/sessions/")
 
+    return len(session_list)
+    
 
-session_number = 1
+    
+
 
 def clear(): 
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -36,10 +43,10 @@ def parse(raw_input, list=[]):
     if command_name in globals() and callable(globals()[command_name]) and not command_name in blacklist:
         stack = globals()[command_name]
         if arguments:
-            stack(arguments[0])
+            return stack(arguments[0])
         else:
             try: 
-                stack() 
+                return stack() 
             except TypeError as error:
               print(error)
               print("Given command is missing a parameter")
@@ -54,7 +61,7 @@ def parse(raw_input, list=[]):
 
 def new(arg):
     clear()
-    global session_number
+    global current_session
 
     match arg:
         case "user":
@@ -63,8 +70,8 @@ def new(arg):
                 new_user = input("Enter name of new user: ").strip()
                 if new_user and new_user.isprintable():
                     if input(f"Create a new user named {new_user}? (y/n)") in ["yes", "y"]:
-                        with open("./data/users.json", "r") as file:
-                            users_data = json.load(file)
+                        
+                        users_data = get_json("users")
 
                         for i in users_data.keys():
                             if users_data[i] == True:
@@ -72,27 +79,23 @@ def new(arg):
                         
                         users_data[new_user] = True
 
-                        with open("./data/users.json", "w") as file:
-                            json.dump(users_data, file, indent=2)
+                        get_json("users", users_data)
+                        
                         print(f"{new_user} has been created and selected\nType \"back\" to return home")
                         parse(input())
                         return
                 else: print("Sorry the given user name is invalid please pick a different name")
         
         case "session":
-            session_list = os.listdir("./data/sessions/")
-            newest_session = session_list[len(session_list) - 1]
-            session_number = int(newest_session.rstrip(".json")) + 1
-
-            with open(f"./data/sessions/{session_number}.json", "x") as file:
-                return       
+            numb = getLatestSessionNumb() + 1
+            current_session = DataHandler.Session(numb)
+            current_session.dump()
         
         case "entry":
             
             try: 
-                with open(f"./data/sessions/{session_number}.json", "r") as file:
-                    session_data = json.load(file)
-            except:
+                session_data = get_json("sessions/" + str(session_number))
+            except NameError:
                 print("Session not found or not selected please select or create a new session.\n")
                 return
             
@@ -138,8 +141,7 @@ def new(arg):
 
             comb_entries = {**session_data, **new_entry}
 
-            with open(f"./data/sessions/{session_number}.json", "w") as file:
-                json.dump(comb_entries, file, indent=2)
+            get_json("sessions/" + session_number, comb_entries)
 
             
 def register(dict, entry, key, type="i", message=None):
@@ -175,16 +177,70 @@ def register(dict, entry, key, type="i", message=None):
                     
 
 def sessions():
+    global session_number
     clear()
 
     session_list = os.listdir("./data/sessions/")
     
-    for i in range(len(session_list)):
-        session_list[i] = "Session #" + session_list[i].rstrip(".json")
+    while True:
+        for i in range(len(session_list)):
+            session_list[i] = session_list[i].rstrip(".json")
 
-        print(session_list[i])
+            if session_number == session_list[i]:
+                print("Session #" + session_list[i] + "(selected)")
+            else:
+                print("Session #" + session_list[i])
+        
+        raw_input = input("\nEnter session number to view or type \"back\"\n")
+        session_number = raw_input
+
+        if raw_input in session_list:
+            session_data = get_json("sessions/" + raw_input)
+            
+            for i in session_data.keys():
+                print(i)
+            
+            entry_name = parse(input("\nPlease type the entry you'd like to view\nOr type \"back\" to return home\n"), session_data.keys())
+
+            clear()
+
+            if entry_name: 
+                selected_entry = session_data[entry_name]
+            else:
+                return
+            
+            print(entry_name + ":")
+            for x in selected_entry:
+                
+                if not selected_entry[x]:
+                    print(f"\t{x}:N/A")
+                elif len(selected_entry[x]) > 150:
+                    message = selected_entry[x][:150] + "..."
+                    print(f"\t{x}:{message}")
+                else:
+                    print(f"\t{x}:{selected_entry[x]}")
+            
+            topic = parse(input("\nType the name of a topic to edit it or type \"back\" to return\n"), selected_entry.keys())
+
+            if topic: 
+                session_data[entry_name][topic] = input("%s:\n\t%s: " % (entry_name, topic))
+            else:
+                return
+            
+            get_json("sessions/" + raw_input, session_data)
+            
+            clear()
+            return
+
+
+        elif raw_input == "back":
+            back()
+            return
+        else:
+            print("Invalid Session please try again")
+
+
     
-    parse(input(), session_list + list(range(1, len(session_list))))
     
 
 
@@ -193,8 +249,7 @@ def sessions():
 def users():
     clear()
     
-    with open("./data/users.json", "r") as file:
-        users_data = json.load(file)
+    users_data = get_json("users")
 
     while True:
         user_list = []
@@ -219,9 +274,8 @@ def users():
             print("MATCHED")
             users_data[user_selected] = False
             users_data[requested_user] = True
-            with open("./data/users.json", "w") as file:
-                json.dump(users_data, file, indent=2)
-                print("DUMPED")
+            
+            get_json("users", users_data)
         else:
             return
         
@@ -231,3 +285,13 @@ def users():
 
 def back():
     clear()
+
+
+def get_json(path, data=None):
+    if data:
+        with open(f"./data/{path}.json", "w") as file:
+            json.dump(data, file, indent=2)
+    else:
+        with open(f"./data/{path}.json", "r") as file:
+            return json.load(file)
+
