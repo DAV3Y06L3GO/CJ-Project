@@ -16,8 +16,17 @@ class Session():
         return self.entries[_id]
     
 
+
+    
+    def constructEntry(self, name, gps, date, genus, species, substrate, terrain, gill, other):
+        self.entries.append(Entry(name, gps, date, genus, species, substrate, terrain, gill, other))
+
+
+
+
+
     def dump(self):
-        path = f"./data/{self.id}.dat"
+        path = f"./data/sessions/{self.id}.dat"
         
         if not os.path.exists(path):
             with open(path, "x") as file:
@@ -35,5 +44,13 @@ class Session():
 
 class Entry():
 
-    def __init__(self):
-        self.name = None
+    def __init__(self, name, gps, date, genus, species, substrate, terrain, gill, other):
+        self.name = name
+        self.gps = gps
+        self.date = date
+        self.genus = genus
+        self.species = species
+        self.substrate = substrate
+        self.terrain = terrain
+        self.gill = gill
+        self.other = other

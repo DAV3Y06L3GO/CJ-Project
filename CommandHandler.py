@@ -13,12 +13,24 @@ gill_types = dict(enumerate(["Adnate", "Adnexed", "Decurrent", "Emarginate", "Fr
 current_session = None
 
 def getLatestSessionNumb():
-    session_list = os.listdir("./data/sessions/")
+    session_list = os.listdir("./data/sessions")
 
     return len(session_list)
     
+def dropdownMenu(key, message):
+    while True:
+        print(f"Please select a {key} type:")
+        for x in message:
+            print(f"\t{x}:{message[x]}")
+                            
+        user_input = input()
 
-    
+        for x in message:
+            if user_input == str(x) or user_input == message[x]:
+                return message[x]
+                                    
+        print(f"String was not a valid {key} type, please try again")
+        
 
 
 def clear(): 
@@ -93,100 +105,44 @@ def new(arg):
         
         case "entry":
             
-            try: 
-                session_data = get_json("sessions/" + str(session_number))
-            except NameError:
+            if current_session:
+
+                name = input("What would you like to call this entry?\n")
+
+                gps = None
+                date = datetime.datetime.now().strftime("%x, %H:%M")
+
+                genus = input("What is the genus?\n")
+                species = input("What is the species?\n")
+                substrate = input("What is the substrate?\n")
+                terrain = input("What is the terrain?\n")
+                
+                gill = dropdownMenu("gill", gill_types)
+
+                other = input("Any other notes?\n")
+
+                current_session.constructEntry(name, gps, date, genus, species, substrate, terrain, gill, other)
+
+                current_session.dump()
+
+            else:
                 print("Session not found or not selected please select or create a new session.\n")
                 return
-            
-            name = input("What would you like to call this entry?\n")
-            new_entry = {
-                name: {
-                    "gps": None,
-                    "date": None,
-                    "genus": None,
-                    "species": None,
-                    "substrate": None,
-                    "terrain": None,
-                    "gill": None,
-                    "other": None
-                }
-            }
 
-            ####################GPS GOES HERE########################
-            
-            # time & date register
-            now = datetime.datetime.now()
-            new_entry[name]["date"] = now.strftime("%x, %H:%M")
-
-            # Genus registry
-            register(new_entry, name, "genus")
-            
-            
-            # Species Registry
-            register(new_entry, name, "species")
-
-            # Substrate Registry
-            register(new_entry, name, "substrate")
-
-            # Habitat Registry
-            register(new_entry, name, "terrain")
-
-            # Gill Registry
-            register(new_entry, name, "gill", "d", gill_types)
-
-            # other
-            register(new_entry, name, "other", message="Any other notes?")
-
-
-            comb_entries = {**session_data, **new_entry}
-
-            get_json("sessions/" + session_number, comb_entries)
-
-            
-def register(dict, entry, key, type="i", message=None):
-    while True:
-            match type:
-                case "i":
-                    if message:
-                        print(message)
-                    else:
-                        print(f"What is the {key}?")
-                    user_input = input()
-
-                    if user_input.strip and user_input.isprintable():
-                        dict[entry][key] = user_input
-                        return
-                    else:
-                        print("String empty, please try again")
-                
-                case "d":
-                    print(f"Please select a {key} type:")
-                    for x in message:
-                        print(f"\t{x}:{message[x]}")
-                    
-                    user_input = input()
-
-                    for x in message:
-                        if user_input == str(x) or user_input == message[x]:
-                            dict[entry][key] = message[x]
-                            return
-                    print(f"String was not a valid {key} type, please try again")
                         
                     
                     
 
 def sessions():
-    global session_number
     clear()
 
     session_list = os.listdir("./data/sessions/")
     
     while True:
         for i in range(len(session_list)):
-            session_list[i] = session_list[i].rstrip(".json")
+            session_list[i] = session_list[i].rstrip(".dat")
 
-            if session_number == session_list[i]:
+            if current_session.id == session_list[i]:
                 print("Session #" + session_list[i] + "(selected)")
             else:
                 print("Session #" + session_list[i])
