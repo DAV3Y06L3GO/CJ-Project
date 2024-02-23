@@ -11,11 +11,6 @@ blacklist = ["parse", "register"]
 gill_types = dict(enumerate(["Adnate", "Adnexed", "Decurrent", "Emarginate", "Free", "Seceding", "Sinuate", "Subdecurrent"]))
 
 current_session = None
-
-def getLatestSessionNumb():
-    session_list = os.listdir("./data/sessions")
-
-    return len(session_list)
     
 def dropdownMenu(key, message):
     while True:
@@ -99,8 +94,24 @@ def new(arg):
                 else: print("Sorry the given user name is invalid please pick a different name")
         
         case "session":
-            numb = getLatestSessionNumb() + 1
-            current_session = DataHandler.Session(numb)
+            sdir = os.listdir("./data/sessions")
+            time = datetime.datetime.now().strftime("%m-%d-%y")
+            numb = 2
+            for i in sdir:
+                if time == i.rstrip(".dat"):
+                    time = i.rstrip(".dat") + f" ({numb})"
+                    loop = True
+                    while loop:
+                        for i in sdir:
+                            if time == i.rstrip(".dat"):
+                                time = time.rstrip(f" ({numb})") + f" ({numb + 1})"
+                                numb += 1
+                            else:
+                                loop = False
+                                break
+
+
+            current_session = DataHandler.Session(time)
             current_session.dump()
         
         case "entry":
@@ -134,59 +145,57 @@ def new(arg):
                     
 
 def sessions():
+    global current_session
+    
     clear()
 
-    session_list = os.listdir("./data/sessions/")
-    
-    while True:
-        for i in range(len(session_list)):
-            session_list[i] = session_list[i].rstrip(".dat")
+    session_list = DataHandler.getSessions()
 
-            if current_session.id == session_list[i]:
-                print("Session #" + session_list[i] + "(selected)")
-            else:
-                print("Session #" + session_list[i])
+    while True:
         
+        for i in session_list:
+            if not current_session == None:
+                if str(current_session.id) == i:
+                    print(i + " (selected)")
+                else:
+                    print(i)
+            else:
+                print(i)
+
         raw_input = input("\nEnter session number to view or type \"back\"\n")
-        session_number = raw_input
 
         if raw_input in session_list:
-            session_data = get_json("sessions/" + raw_input)
-            
-            for i in session_data.keys():
+            clear()
+
+            current_session = DataHandler.load(raw_input)
+
+            entry_names = current_session.getEntryNames()
+
+            for i in entry_names:
                 print(i)
             
-            entry_name = parse(input("\nPlease type the entry you'd like to view\nOr type \"back\" to return home\n"), session_data.keys())
+            entry_name = parse(input("\nPlease type the entry you'd like to view\nOr type \"back\" to return home\n"), entry_names)
+
+            if entry_name == None:
+                return
 
             clear()
 
-            if entry_name: 
-                selected_entry = session_data[entry_name]
-            else:
-                return
+            selected_entry = current_session.getEntry(entry_name)
             
             print(entry_name + ":")
-            for x in selected_entry:
-                
-                if not selected_entry[x]:
-                    print(f"\t{x}:N/A")
-                elif len(selected_entry[x]) > 150:
-                    message = selected_entry[x][:150] + "..."
-                    print(f"\t{x}:{message}")
-                else:
-                    print(f"\t{x}:{selected_entry[x]}")
-            
-            topic = parse(input("\nType the name of a topic to edit it or type \"back\" to return\n"), selected_entry.keys())
 
-            if topic: 
-                session_data[entry_name][topic] = input("%s:\n\t%s: " % (entry_name, topic))
-            else:
-                return
+            print(entryFormater("GPS", selected_entry.gps))
+            print(entryFormater("Date", selected_entry.date))
+            print(entryFormater("Genus", selected_entry.genus))
+            print(entryFormater("Species", selected_entry.species))
+            print(entryFormater("Substrate", selected_entry.substrate))
+            print(entryFormater("Terrain", selected_entry.terrain))
+            print(entryFormater("Gill", selected_entry.gill))
+            print(entryFormater("Notes", selected_entry.other))
+                
             
-            get_json("sessions/" + raw_input, session_data)
-            
-            clear()
-            return
+            parse(input())
 
 
         elif raw_input == "back":
@@ -237,6 +246,18 @@ def users():
         
         clear()
         print(f"{requested_user} has been selected")
+
+
+
+
+def entryFormater(x, data):
+    if not data:
+        return f"\t{x}: N/A"
+    elif len(data) > 150:
+        message = data[:150] + "..."
+        return f"\t{x}: {message}"
+    else:
+        return f"\t{x}: {data}"
 
 
 def back():

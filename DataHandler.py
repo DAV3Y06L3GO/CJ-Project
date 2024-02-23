@@ -7,13 +7,17 @@ class Session():
         self.id = id
         self.entries = entries
 
-    def getEntryFromName(self, _id):
+    def getEntryNames(self):
+        names = []
+        for i in self.entries:
+            names.append(i.name)
+        return names
+
+    
+    def getEntry(self, _id):
         for i in self.entries:
             if i.name == _id:
                 return i
-    
-    def getEntryFromInt(self, _id):
-        return self.entries[_id]
     
 
 
@@ -54,3 +58,22 @@ class Entry():
         self.terrain = terrain
         self.gill = gill
         self.other = other
+
+
+
+
+
+def load(file):
+    path = f"./data/sessions/{file}.dat"
+
+    with open(path, "rb") as f:
+            session = pickle.load(f)
+    return session
+
+
+def getSessions():
+    session_list = os.listdir("./data/sessions/")
+
+    for i in range(len(session_list)):
+        session_list[i] = session_list[i].rstrip(".dat")
+    return session_list
